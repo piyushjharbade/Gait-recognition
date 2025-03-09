@@ -1,0 +1,2 @@
+ipynbss/alexnet_cifar10.pth filter=lfs diff=lfs merge=lfs -text
+data/cifar-10-python.tar.gz filter=lfs diff=lfs merge=lfs -text
