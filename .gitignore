@@ -1,4 +1,6 @@
-ipynbss/alexnet_cifar10.pth
-CASIA-a/cifar-10-python.tar
 data/cifar-10-python.tar.gz 
 ipynbss/alexnet_cifar10.pth 
+CASIA-a
+data
+Lib
+Scripts
