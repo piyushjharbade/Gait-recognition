@@ -58,23 +58,23 @@ class MLPClassifier(nn.Module):
     # Training function (returns loss history)
 
 
-def train(model, criterion, optimizer, X_train, y_train, epochs=100):
+def train(model, criterion, optimizer, X_train, y_train, epochs=100, batch_size=32):
     model.train()
     loss_history = []
+    dataset = torch.utils.data.TensorDataset(torch.from_numpy(X_train),
+                                             torch.from_numpy(y_train).unsqueeze(1))
+    loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True)
+
     for epoch in range(epochs):
-        inputs = torch.from_numpy(X_train)
-        labels = torch.from_numpy(y_train).unsqueeze(1)
-
-        optimizer.zero_grad()
-        outputs = model(inputs)
-        loss = criterion(outputs, labels)
-        loss.backward()
-        optimizer.step()
-
-        loss_history.append(loss.item())
-        if (epoch + 1) % 20 == 0:
-            print(f"Epoch [{epoch + 1}/{epochs}], Loss: {loss.item():.4f}")
-    return loss_history
+        epoch_loss = 0
+        for inputs, labels in loader:
+            optimizer.zero_grad()
+            outputs = model(inputs)
+            loss = criterion(outputs, labels)
+            loss.backward()
+            optimizer.step()
+            epoch_loss += loss.item()
+        loss_history.append(epoch_loss / len(loader))
 
 
 # Evaluation
@@ -109,19 +109,23 @@ def plot_decision_boundary(model, X, y):
     plt.grid(True)
     plt.show()
 
-
-# Plot Loss Curve
 def plot_loss_curve(loss_history):
     plt.figure()
     plt.plot(loss_history, label='Loss')
+    plt.xlabel("Epoch")
+    plt.ylabel("Binary Cross Entropy Loss")
+    plt.title("Training Loss Curve")
+    plt.grid(True)
+    plt.legend()
+    plt.show()
 
 
-plt.xlabel("Epoch")
-plt.ylabel("Binary Cross Entropy Loss")
-plt.title("Training Loss Curve")
-plt.grid(True)
-plt.legend()
-plt.show()
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model = MLPClassifier().to(device)
+inputs = inputs.to(device)
+labels = labels.to(device)
+
+
 # Main
 if __name__ == "__main__":
     # Generate data
